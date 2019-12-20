@@ -1,0 +1,33 @@
+The Naive Bayes classifier is a quite simple and popular classifier that is entirely based on a conditional independence assumption. Let's suppose that we have a set of  nn  features  F1,F2,...,FnF1,F2,...,Fn  and a class label  CC . The Naive Bayes classifier assumes that the features are independent of each other given a known class label, which is another way of saying that
+
+P(C,F1,F2,...,Fn)=P(F1,F2,...,Fn|C)P(C)=P(C)∏iP(Fi|C)
+P(C,F1,F2,...,Fn)=P(F1,F2,...,Fn|C)P(C)=P(C)∏iP(Fi|C)
+ 
+Now, the classification problem is to determine the class label given the values of the features  F1,F2,...,FnF1,F2,...,Fn . If we have  mm  classes, we can find the class label by calculating  P(Cj|F1,F2,...,Fn)P(Cj|F1,F2,...,Fn)  for  1≤j≤m1≤j≤m 
+P(Cj|F1,F2,...,Fn)=P(Cj,F1,F2,...,Fn)P(F1,F2,...,Fn)=P(Cj)∏iP(Fi|Cj)P(F1,F2,...,Fn)=αP(Cj)∏iP(Fi|Cj)
+P(Cj|F1,F2,...,Fn)=P(Cj,F1,F2,...,Fn)P(F1,F2,...,Fn)=P(Cj)∏iP(Fi|Cj)P(F1,F2,...,Fn)=αP(Cj)∏iP(Fi|Cj)
+ 
+and then choosing
+
+k=maxjP(Cj|F1,F2,...,Fn)
+k=maxjP(Cj|F1,F2,...,Fn)
+ 
+as the class label. In the above equation, we notice that  P(F1,F2,...,Fn)P(F1,F2,...,Fn)  doesn't have to be calculated explicitly, i.e. instead of calculating  P(F1,F2,...,Fn)P(F1,F2,...,Fn) , we can calculate  P(Cj)∏iP(Fi|Cj)P(Cj)∏iP(Fi|Cj)  for  1≤j≤m1≤j≤m  and then normalise the values using  α=∑jP(Cj)∏iP(Fi|Cj)α=∑jP(Cj)∏iP(Fi|Cj) .
+
+In this exercise, you will implement your very own Naive Bayes classifier that can be used for predicting the stability of object placements on a table. The scenario is one in which our robot Jenny is putting objects on a table, such that we'll suppose that the robot chooses a random continuous table pose for placement and then tries to predict whether placing a point object there will be successful by describing the pose with a few features.
+
+The scenario we are considering is visualised from a top view in the image below (note: the blue square is the table, the red squares are the objects on it, and the orange dot is Jenny).
+
+
+Let's suppose that a pose is described using the following features, all of which are discrete:
+
+Inside table: Takes the values  00  and  11 , corresponding to whether a pose is outside or inside the table respectively.
+Distance to the robot: Takes the values  00 ,  11 , and  22 , corresponding to very close, reachable, and far.
+Minimum distance to the other objects: Takes the values  00 ,  11 , and  22 , corresponding to very close, close, and far.
+Distance to the closest surface edge: Also takes the values  00 ,  11 , and  22 , corresponding to very close, close, and far.
+Each pose either leads to a successful execution or not, so we have two classes, namely  00  and  11 , corresponding to the outcomes failure and success respectively.
+
+Your task now consists of the following steps:
+
+You are given a data set (data/train.txt) of features describing  15001500  poses and the class labels of these. Use the data in this data set for learning the prior probabilities  P(Cj)P(Cj)  and the conditional probabilities  P(Fi|Cj)P(Fi|Cj) ,  i∈{1,2,3,4}i∈{1,2,3,4} ,  j∈{1,2}j∈{1,2} . Note that learning in this context means calculating the values of the probabilities as relative frequencies.
+Use the test data set (data/test.txt) for testing your classifier (i.e. predict the class labels of the  500500  test points using the given features and compare the predicted labels with the actual labels).

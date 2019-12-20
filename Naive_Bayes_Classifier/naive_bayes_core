@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Dec  8 11:07:27 2019
+
+@author: manoj
+"""
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = np.loadtxt('train.txt')
+test = np.loadtxt('test.txt')
+cordinate = np.loadtxt('test_points.txt')
+I_T = data[:,0] 
+D_T_R = data[:,1]
+M_R_O = data[:,2]
+D_T_C = data[:,3]
+CLASS = data[:,4]
+
+def prob(data_feature, Class):
+    length = len(data_feature)
+    no_of_ones = np.count_nonzero(Class)
+    no_of_zero = length - no_of_ones
+    zero1 = 0
+    one1 = 0
+    two1 = 0
+    zero2 = 0
+    one2 = 0
+    two2 = 0
+    for i, j in zip(data_feature, Class):
+        if j == 0:
+            if (i == 0):
+                zero1+=1
+            elif(i == 1):
+                one1+=1
+            else:
+                two1+=1
+        elif j == 1:
+            if (i == 0):
+                zero2+=1
+            elif(i == 1):
+                one2+=1
+            else:
+                two2+=1
+    new = [zero1/no_of_zero,one1/no_of_zero,two1/no_of_zero,zero2/no_of_ones,one2/no_of_ones,two2/no_of_ones]
+    return new
+
+
+
+new = prob(I_T,CLASS)
+print(new) 
+likelihood_table_I_T = np.array([[0, 0, 1],
+                                [0, new[0] , new[3]],
+                                [1, new[1] , new[4]],
+                                [2, new[2] , new[5]]])
+new = prob(D_T_R,CLASS)
+print(new)
+likelihood_table_D_T_R = np.array([[0, 0, 1],
+                                [0, new[0] , new[3]],
+                                [1, new[1] , new[4]],
+                                [2, new[2] , new[5]]])
+new = prob(M_R_O,CLASS)
+print(new)
+likelihood_table_M_R_O = np.array([[0, 0, 1],
+                                [0, new[0] , new[3]],
+                                [1, new[1] , new[4]],
+                                [2, new[2] , new[5]]])
+new = prob(D_T_C,CLASS)
+print(new)
+likelihood_table_D_T_C = np.array([[0, 0, 1],
+                                [0, new[0] , new[3]],
+                                [1, new[1] , new[4]],
+                                [2, new[2] , new[5]]])
+# print(likelihood_table_I_T)
+# print(likelihood_table_D_T_R)
+# print(likelihood_table_M_R_O)
+# print(likelihood_table_D_T_C)
+length = len(CLASS)
+no_of_ones = np.count_nonzero(CLASS)
+no_of_ones = no_of_ones/length
+no_of_zero = length - no_of_ones
+no_of_zero = no_of_zero/length
+predicted = []
+for i in test:
+    I_T_test_zero = i[0]
+    D_T_R_test_zero = i[1]
+    M_R_O_test_zero = i[2]
+    D_T_C_test_zero = i[3]
+#     print(I_T_test_zero)
+#     print(likelihood_table_I_T[int(I_T_test_zero+1),1])
+    m = (likelihood_table_I_T[int(I_T_test_zero+1),1]+likelihood_table_I_T[int(I_T_test_zero+1),2]) *(likelihood_table_D_T_R[int(D_T_R_test_zero+1),1]+likelihood_table_D_T_R[int(D_T_R_test_zero+1),2])*(likelihood_table_M_R_O[int(M_R_O_test_zero+1),1]+likelihood_table_M_R_O[int(M_R_O_test_zero+1),2])*(likelihood_table_D_T_C[int(D_T_C_test_zero+1),1]+likelihood_table_D_T_C[int(D_T_C_test_zero+1),2])
+    zero = (likelihood_table_I_T[int(I_T_test_zero+1),1] *likelihood_table_D_T_R[int(D_T_R_test_zero+1),1]*likelihood_table_M_R_O[int(M_R_O_test_zero+1),1]*likelihood_table_D_T_C[int(D_T_C_test_zero+1),1])*(no_of_zero)    
+    I_T_test_one = i[0]
+    D_T_R_test_one = i[1]
+    M_R_O_test_one = i[2]
+    D_T_C_test_one = i[3]
+    one = (likelihood_table_I_T[int(I_T_test_one+1),2] *likelihood_table_D_T_R[int(D_T_R_test_one+1),2]*likelihood_table_M_R_O[int(M_R_O_test_one+1),2]*likelihood_table_D_T_C[int(D_T_C_test_one+1),2]*no_of_ones)
+    # print(zero,one)
+    if one>zero:
+        predicted.append(1)
+    else:
+        predicted.append(0)
+print(test[-1])
+predicted = np.asarray(predicted)
+predicted = predicted[:,np.newaxis]
+count = 0
+for i,j in zip(predicted,test[:,4]):
+    if i==j:
+        count+=1
+accuracy = (count/len(predicted))*100
+sh =  np.hstack((cordinate,predicted))
+col = np.where(sh[:,2] == 1,'g',np.where(sh[:,2] == 0,'b','r'))
+plt.scatter(sh[:,0], sh[:,1],c = col, s=5, linewidth=2)
+plt.show()
+# Please assign the values of the confusion matrix to the following variables.
+true_positive = 81
+false_positive = 0
+true_negative = 7
+false_negative = 0
+
+# Please assign the accuracy to the following variable.
+accuracy = accuracy
+print("Accuracy is:",accuracy,"percent")
